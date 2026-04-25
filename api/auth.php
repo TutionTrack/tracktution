@@ -27,7 +27,10 @@ if ($action === 'register') {
         
         mail($email, $subject, $message, $headers);
         
-        echo json_encode(["message" => "OTP sent to email"]);
+        echo json_encode([
+            "message" => "OTP sent (Debug: Check your email or use code: $otp)",
+            "otp_debug" => $otp 
+        ]);
     } catch (Exception $e) {
         echo json_encode(["error" => "User already exists or error: " . $e->getMessage()]);
     }
