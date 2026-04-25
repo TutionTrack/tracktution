@@ -9,16 +9,25 @@ if ($action === 'register') {
     $email = $data['email'];
     $password = password_hash($data['password'], PASSWORD_DEFAULT);
     
-    // Create user (inactive until OTP)
-    $stmt = $pdo->prepare("INSERT INTO Users (name, email, password, is_active) VALUES (?, ?, ?, 0)");
-    try {
+    // Check if user exists
+    $stmt = $pdo->prepare("SELECT id FROM Users WHERE email = ?");
+    $stmt->execute([$email]);
+    $existingUser = $stmt->fetch();
+    
+    if ($existingUser) {
+        $userId = $existingUser['id'];
+        $pdo->prepare("UPDATE Users SET name = ?, password = ? WHERE id = ?")->execute([$name, $password, $userId]);
+    } else {
+        $stmt = $pdo->prepare("INSERT INTO Users (name, email, password, is_active) VALUES (?, ?, ?, 0)");
         $stmt->execute([$name, $email, $password]);
         $userId = $pdo->lastInsertId();
-        
-        // Generate OTP
-        $otp = rand(100000, 999999);
-        $stmt = $pdo->prepare("INSERT INTO EmailOTPs (user_id, otp, type) VALUES (?, ?, 'verification')");
-        $stmt->execute([$userId, $otp]);
+    }
+    
+    // Generate OTP
+    $otp = (string)rand(100000, 999999);
+    $pdo->prepare("DELETE FROM EmailOTPs WHERE user_id = ?")->execute([$userId]);
+    $stmt = $pdo->prepare("INSERT INTO EmailOTPs (user_id, otp, type) VALUES (?, ?, 'verification')");
+    $stmt->execute([$userId, $otp]);
         
         // Send OTP via Email
         $subject = "Your TrackTution Verification Code";
