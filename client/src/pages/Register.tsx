@@ -20,9 +20,8 @@ export default function Register() {
     });
     const data = await res.json();
     if (res.ok) {
-      setUserId(data.userId);
       setStep(2);
-      setMsg("OTP sent to your email.");
+      setMsg(data.message); // Show the "OTP sent (Debug: ...)" message
     } else {
       setMsg(data.error);
     }
@@ -33,7 +32,7 @@ export default function Register() {
     const res = await fetch("/api/auth.php?action=verify", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId, otp, type: "register" })
+      body: JSON.stringify({ email, otp })
     });
     if (res.ok) {
       alert("Registration successful. Please login.");
