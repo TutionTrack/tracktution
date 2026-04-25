@@ -10,7 +10,7 @@ export default function LogSession() {
   const [comments, setComments] = useState("");
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL || "http://localhost:3000"}` + "/api/students", {
+    fetch("/api/students", {
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
     })
     .then(res => res.json())
@@ -30,7 +30,7 @@ export default function LogSession() {
 
   const handleLog = async (e: React.FormEvent) => {
     e.preventDefault();
-    const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:3000"}` + "/api/logs", {
+    const res = await fetch("/api/logs", {
       method: "POST",
       headers: { 
         "Content-Type": "application/json",

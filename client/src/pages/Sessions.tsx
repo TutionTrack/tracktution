@@ -5,7 +5,7 @@ export default function Sessions() {
 
   useEffect(() => {
     const fetchSessions = async () => {
-      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:3000"}` + "/api/sessions", {
+      const res = await fetch("/api/sessions", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
       });
       if (res.ok) {

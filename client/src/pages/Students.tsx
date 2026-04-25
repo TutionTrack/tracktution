@@ -5,7 +5,7 @@ export default function Students() {
 
   useEffect(() => {
     const fetchStudents = async () => {
-      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:3000"}` + "/api/students", {
+      const res = await fetch("/api/students", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
       });
       if (res.ok) {

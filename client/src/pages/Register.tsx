@@ -13,7 +13,7 @@ export default function Register() {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:3000"}` + "/api/auth/register", {
+    const res = await fetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, email, password })
@@ -30,7 +30,7 @@ export default function Register() {
 
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
-    const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:3000"}` + "/api/auth/verify-otp", {
+    const res = await fetch("/api/auth/verify-otp", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ userId, otp, type: "register" })

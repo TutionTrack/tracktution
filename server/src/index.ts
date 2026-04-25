@@ -21,6 +21,13 @@ app.use('/api/sessions', sessionRoutes);
 app.use('/api/logs', logRoutes);
 app.use('/api/reports', reportRoutes);
 
+import path from 'path';
+// Serve static frontend files
+app.use(express.static(path.join(__dirname, '../../client/dist')));
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../../client/dist/index.html'));
+});
+
 const PORT = process.env.PORT || 3000;
 
 sequelize.sync({ alter: true }).then(() => {
