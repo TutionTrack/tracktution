@@ -56,30 +56,41 @@ export default function Sessions() {
       </div>
 
       {showForm && (
-        <div className="card" style={{ marginBottom: "2rem" }}>
-          <h3 style={{ marginBottom: "1rem" }}>Schedule Session</h3>
-          <form onSubmit={handleSchedule} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-            <select required className="form-input" value={newSession.student_id} onChange={e => setNewSession({...newSession, student_id: e.target.value})}>
-              <option value="">Select Student</option>
-              {students.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-            </select>
-            <input placeholder="Subject" required className="form-input" value={newSession.subject} onChange={e => setNewSession({...newSession, subject: e.target.value})} />
-            <input type="date" required className="form-input" value={newSession.date} onChange={e => setNewSession({...newSession, date: e.target.value})} />
-            <div style={{ display: "flex", gap: "0.5rem" }}>
-              <input type="time" required className="form-input" value={newSession.start_time} onChange={e => setNewSession({...newSession, start_time: e.target.value})} />
-              <input type="time" required className="form-input" value={newSession.end_time} onChange={e => setNewSession({...newSession, end_time: e.target.value})} />
-            </div>
-            <select className="form-input" value={newSession.recurring_type} onChange={e => setNewSession({...newSession, recurring_type: e.target.value})}>
-              <option value="none">One-time</option>
-              <option value="weekly">Weekly</option>
-              <option value="biweekly">Bi-weekly</option>
-              <option value="monthly">Monthly</option>
-            </select>
-            <div style={{ gridColumn: "span 2", display: "flex", gap: "1rem" }}>
-              <button type="submit" className="btn btn-primary">Schedule</button>
-              <button type="button" className="btn" onClick={() => setShowForm(false)}>Cancel</button>
-            </div>
-          </form>
+        <div style={{
+          position: "fixed",
+          top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: "rgba(0,0,0,0.5)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 1000,
+          padding: "1rem"
+        }}>
+          <div className="card" style={{ width: "100%", maxWidth: "500px", boxShadow: "0 20px 25px -5px rgba(0,0,0,0.1)" }}>
+            <h3 style={{ marginBottom: "1.5rem", color: "var(--primary)" }}>Schedule Session</h3>
+            <form onSubmit={handleSchedule} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+              <select required className="form-input" value={newSession.student_id} onChange={e => setNewSession({...newSession, student_id: e.target.value})}>
+                <option value="">Select Student</option>
+                {students.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+              </select>
+              <input placeholder="Subject" required className="form-input" value={newSession.subject} onChange={e => setNewSession({...newSession, subject: e.target.value})} />
+              <input type="date" required className="form-input" value={newSession.date} onChange={e => setNewSession({...newSession, date: e.target.value})} />
+              <div style={{ display: "flex", gap: "0.5rem" }}>
+                <input type="time" required className="form-input" value={newSession.start_time} onChange={e => setNewSession({...newSession, start_time: e.target.value})} />
+                <input type="time" required className="form-input" value={newSession.end_time} onChange={e => setNewSession({...newSession, end_time: e.target.value})} />
+              </div>
+              <select className="form-input" value={newSession.recurring_type} onChange={e => setNewSession({...newSession, recurring_type: e.target.value})}>
+                <option value="none">One-time</option>
+                <option value="weekly">Weekly</option>
+                <option value="biweekly">Bi-weekly</option>
+                <option value="monthly">Monthly</option>
+              </select>
+              <div style={{ display: "flex", gap: "1rem", marginTop: "0.5rem" }}>
+                <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>Schedule</button>
+                <button type="button" className="btn" style={{ flex: 1 }} onClick={() => setShowForm(false)}>Cancel</button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
 

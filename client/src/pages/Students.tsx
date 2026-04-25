@@ -55,19 +55,30 @@ export default function Students() {
       </div>
 
       {showForm && (
-        <div className="card" style={{ marginBottom: "2rem" }}>
-          <h3 style={{ marginBottom: "1rem" }}>Add New Student</h3>
-          <form onSubmit={handleAdd} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-            <input placeholder="Name" required className="form-input" value={newStudent.name} onChange={e => setNewStudent({...newStudent, name: e.target.value})} />
-            <input placeholder="Email" className="form-input" value={newStudent.email} onChange={e => setNewStudent({...newStudent, email: e.target.value})} />
-            <input placeholder="Phone" className="form-input" value={newStudent.phone} onChange={e => setNewStudent({...newStudent, phone: e.target.value})} />
-            <input placeholder="Board (e.g. CBSE)" className="form-input" value={newStudent.board} onChange={e => setNewStudent({...newStudent, board: e.target.value})} />
-            <input placeholder="Grade" className="form-input" value={newStudent.grade} onChange={e => setNewStudent({...newStudent, grade: e.target.value})} />
-            <div style={{ gridColumn: "span 2", display: "flex", gap: "1rem" }}>
-              <button type="submit" className="btn btn-primary">Save Student</button>
-              <button type="button" className="btn" onClick={() => setShowForm(false)}>Cancel</button>
-            </div>
-          </form>
+        <div style={{
+          position: "fixed",
+          top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: "rgba(0,0,0,0.5)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 1000,
+          padding: "1rem"
+        }}>
+          <div className="card" style={{ width: "100%", maxWidth: "500px", boxShadow: "0 20px 25px -5px rgba(0,0,0,0.1)" }}>
+            <h3 style={{ marginBottom: "1.5rem", color: "var(--primary)" }}>Add New Student</h3>
+            <form onSubmit={handleAdd} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+              <input placeholder="Name" required className="form-input" value={newStudent.name} onChange={e => setNewStudent({...newStudent, name: e.target.value})} />
+              <input placeholder="Email" className="form-input" value={newStudent.email} onChange={e => setNewStudent({...newStudent, email: e.target.value})} />
+              <input placeholder="Phone" className="form-input" value={newStudent.phone} onChange={e => setNewStudent({...newStudent, phone: e.target.value})} />
+              <input placeholder="Board (e.g. CBSE)" className="form-input" value={newStudent.board} onChange={e => setNewStudent({...newStudent, board: e.target.value})} />
+              <input placeholder="Grade" className="form-input" value={newStudent.grade} onChange={e => setNewStudent({...newStudent, grade: e.target.value})} />
+              <div style={{ display: "flex", gap: "1rem", marginTop: "0.5rem" }}>
+                <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>Save Student</button>
+                <button type="button" className="btn" style={{ flex: 1 }} onClick={() => setShowForm(false)}>Cancel</button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
 
