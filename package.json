@@ -1,0 +1,10 @@
+{
+  "name": "tuition-tracker-monorepo",
+  "version": "1.0.0",
+  "description": "Root package to orchestrate Hostinger deployment",
+  "scripts": {
+    "postinstall": "cd server && npm install && cd ../client && npm install",
+    "build": "cd server && npm run build",
+    "start": "node server/dist/index.js"
+  }
+}
