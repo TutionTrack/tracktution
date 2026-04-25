@@ -24,9 +24,7 @@ const AuthLayout = ({ children }: { children: React.ReactNode }) => {
         <Link to="/sessions" className={`sidebar-link ${location.pathname === "/sessions" ? "active" : ""}`}>Sessions</Link>
         <Link to="/log-session" className={`sidebar-link ${location.pathname === "/log-session" ? "active" : ""}`}>Log Session</Link>
         <Link to="/reports" className={`sidebar-link ${location.pathname === "/reports" ? "active" : ""}`}>Reports</Link>
-        <div style={{ marginTop: "auto" }}>
-          <button onClick={handleLogout} className="sidebar-link" style={{ width: "100%", textAlign: "left", background: "none", border: "none", cursor: "pointer" }}>Logout</button>
-        </div>
+        <button onClick={handleLogout} className="sidebar-link" style={{ background: "none", border: "none", cursor: "pointer", textAlign: "left" }}>Logout</button>
       </aside>
       <main className="main-content">
         {children}
