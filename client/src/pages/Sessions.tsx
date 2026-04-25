@@ -2,18 +2,48 @@ import { useEffect, useState } from "react";
 
 export default function Sessions() {
   const [sessions, setSessions] = useState<any[]>([]);
+  const [students, setStudents] = useState<any[]>([]);
+  const [showForm, setShowForm] = useState(false);
+  const [newSession, setNewSession] = useState({ student_id: "", subject: "", date: "", start_time: "", end_time: "", recurring_type: "none" });
+
+  const fetchData = async () => {
+    const [sRes, stRes] = await Promise.all([
+      fetch("/api/sessions.php", { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }),
+      fetch("/api/students.php", { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } })
+    ]);
+    if (sRes.ok) setSessions(await sRes.json());
+    if (stRes.ok) setStudents(await stRes.json());
+  };
 
   useEffect(() => {
-    const fetchSessions = async () => {
-      const res = await fetch("/api/sessions.php", {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
-      });
-      if (res.ok) {
-        setSessions(await res.json());
-      }
-    };
-    fetchSessions();
+    fetchData();
   }, []);
+
+  const handleSchedule = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const res = await fetch("/api/sessions.php", {
+      method: "POST",
+      headers: { 
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}` 
+      },
+      body: JSON.stringify(newSession)
+    });
+    if (res.ok) {
+      setShowForm(false);
+      setNewSession({ student_id: "", subject: "", date: "", start_time: "", end_time: "", recurring_type: "none" });
+      fetchData();
+    }
+  };
+
+  const handleCancel = async (id: number) => {
+    if (!confirm("Cancel this session?")) return;
+    const res = await fetch(`/api/sessions.php?id=${id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+    });
+    if (res.ok) fetchData();
+  };
 
   return (
     <div>
@@ -22,16 +52,42 @@ export default function Sessions() {
           <h1 className="page-title">Sessions</h1>
           <p className="subtitle">Schedule and view upcoming tuition sessions.</p>
         </div>
-        <button className="btn btn-primary">+ Schedule Session</button>
+        <button className="btn btn-primary" onClick={() => setShowForm(true)}>+ Schedule Session</button>
       </div>
+
+      {showForm && (
+        <div className="card" style={{ marginBottom: "2rem" }}>
+          <h3 style={{ marginBottom: "1rem" }}>Schedule Session</h3>
+          <form onSubmit={handleSchedule} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+            <select required className="form-input" value={newSession.student_id} onChange={e => setNewSession({...newSession, student_id: e.target.value})}>
+              <option value="">Select Student</option>
+              {students.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+            </select>
+            <input placeholder="Subject" required className="form-input" value={newSession.subject} onChange={e => setNewSession({...newSession, subject: e.target.value})} />
+            <input type="date" required className="form-input" value={newSession.date} onChange={e => setNewSession({...newSession, date: e.target.value})} />
+            <div style={{ display: "flex", gap: "0.5rem" }}>
+              <input type="time" required className="form-input" value={newSession.start_time} onChange={e => setNewSession({...newSession, start_time: e.target.value})} />
+              <input type="time" required className="form-input" value={newSession.end_time} onChange={e => setNewSession({...newSession, end_time: e.target.value})} />
+            </div>
+            <select className="form-input" value={newSession.recurring_type} onChange={e => setNewSession({...newSession, recurring_type: e.target.value})}>
+              <option value="none">One-time</option>
+              <option value="weekly">Weekly</option>
+              <option value="biweekly">Bi-weekly</option>
+              <option value="monthly">Monthly</option>
+            </select>
+            <div style={{ gridColumn: "span 2", display: "flex", gap: "1rem" }}>
+              <button type="submit" className="btn btn-primary">Schedule</button>
+              <button type="button" className="btn" onClick={() => setShowForm(false)}>Cancel</button>
+            </div>
+          </form>
+        </div>
+      )}
 
       <div className="card">
         {sessions.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "2rem", color: "var(--text-muted)" }}>
-            No upcoming sessions.
-          </div>
+          <div style={{ textAlign: "center", padding: "2rem", color: "var(--text-muted)" }}>No upcoming sessions.</div>
         ) : (
-          <div className="table-container">
+          <div className="table-responsive">
             <table>
               <thead>
                 <tr>
@@ -46,13 +102,13 @@ export default function Sessions() {
               <tbody>
                 {sessions.map(s => (
                   <tr key={s.id}>
-                    <td>{s.Student?.name}</td>
+                    <td>{s.student_name}</td>
                     <td>{s.subject}</td>
                     <td>{s.date}</td>
                     <td>{s.start_time} - {s.end_time}</td>
                     <td>{s.recurring_type}</td>
                     <td>
-                      <button className="btn btn-danger" style={{ padding: "0.25rem 0.5rem", fontSize: "0.85rem" }}>Cancel</button>
+                      <button onClick={() => handleCancel(s.id)} className="btn btn-danger" style={{ padding: "0.25rem 0.5rem", fontSize: "0.85rem", color: "var(--danger)" }}>Cancel</button>
                     </td>
                   </tr>
                 ))}

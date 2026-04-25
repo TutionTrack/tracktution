@@ -1,18 +1,17 @@
 import { useEffect, useState } from "react";
 
 export default function Dashboard() {
-  const [stats, setStats] = useState({ totalStudents: 0, upcomingSessions: 0, completedWeek: 0, hoursMonth: 0 });
+  const [data, setData] = useState<any>(null);
 
   useEffect(() => {
-    // In a real app, fetch these from an API endpoint
-    // Example: fetch('/api/dashboard', { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } })
-    setStats({
-      totalStudents: 12,
-      upcomingSessions: 5,
-      completedWeek: 8,
-      hoursMonth: 32
-    });
+    fetch("/api/dashboard.php", {
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+    })
+    .then(res => res.json())
+    .then(setData);
   }, []);
+
+  if (!data) return <div>Loading...</div>;
 
   return (
     <div>
@@ -24,25 +23,84 @@ export default function Dashboard() {
       <div className="dashboard-grid">
         <div className="stat-card">
           <div className="stat-title">Total Students</div>
-          <div className="stat-value">{stats.totalStudents}</div>
+          <div className="stat-value">{data.stats.totalStudents}</div>
         </div>
         <div className="stat-card">
           <div className="stat-title">Upcoming Sessions</div>
-          <div className="stat-value" style={{ color: "#f59e0b" }}>{stats.upcomingSessions}</div>
+          <div className="stat-value" style={{ color: "#f59e0b" }}>{data.upcoming.length}</div>
         </div>
         <div className="stat-card">
-          <div className="stat-title">Sessions Completed (Week)</div>
-          <div className="stat-value" style={{ color: "var(--success)" }}>{stats.completedWeek}</div>
+          <div className="stat-title">Total Sessions Logged</div>
+          <div className="stat-value" style={{ color: "var(--success)" }}>{data.stats.totalSessions}</div>
         </div>
         <div className="stat-card">
-          <div className="stat-title">Teaching Hours (Month)</div>
-          <div className="stat-value" style={{ color: "var(--accent)" }}>{stats.hoursMonth}h</div>
+          <div className="stat-title">Teaching Hours</div>
+          <div className="stat-value" style={{ color: "var(--accent)" }}>{data.stats.totalHours}h</div>
         </div>
       </div>
       
-      <div className="card">
-        <h3 style={{ marginBottom: "1rem", color: "var(--primary)" }}>Recent Activity Placeholder</h3>
-        <p style={{ color: "var(--text-muted)" }}>This area can hold a list of recently logged sessions or upcoming schedule.</p>
+      <div className="dashboard-flex-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem", marginTop: "1.5rem" }}>
+        <div className="card">
+          <h3 style={{ marginBottom: "1rem", color: "var(--primary)" }}>Upcoming Sessions</h3>
+          {data.upcoming.length === 0 ? (
+            <p style={{ color: "var(--text-muted)" }}>No upcoming sessions scheduled.</p>
+          ) : (
+            <div className="table-responsive">
+              <table style={{ width: "100%", textAlign: "left", fontSize: "0.9rem" }}>
+                <thead>
+                  <tr style={{ color: "var(--text-muted)", borderBottom: "1px solid var(--border)" }}>
+                    <th style={{ padding: "0.5rem" }}>Student</th>
+                    <th style={{ padding: "0.5rem" }}>Date</th>
+                    <th style={{ padding: "0.5rem" }}>Time</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.upcoming.map((s: any) => (
+                    <tr key={s.id} style={{ borderBottom: "1px solid var(--border)" }}>
+                      <td style={{ padding: "0.5rem" }}>{s.student_name}</td>
+                      <td style={{ padding: "0.5rem" }}>{s.date}</td>
+                      <td style={{ padding: "0.5rem" }}>{s.start_time}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
+        <div className="card">
+          <h3 style={{ marginBottom: "1rem", color: "var(--primary)" }}>Recent Logs</h3>
+          {data.recent.length === 0 ? (
+            <p style={{ color: "var(--text-muted)" }}>No sessions logged yet.</p>
+          ) : (
+            <div className="table-responsive">
+              <table style={{ width: "100%", textAlign: "left", fontSize: "0.9rem" }}>
+                <thead>
+                  <tr style={{ color: "var(--text-muted)", borderBottom: "1px solid var(--border)" }}>
+                    <th style={{ padding: "0.5rem" }}>Student</th>
+                    <th style={{ padding: "0.5rem" }}>Duration</th>
+                    <th style={{ padding: "0.5rem" }}>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.recent.map((l: any) => (
+                    <tr key={l.id} style={{ borderBottom: "1px solid var(--border)" }}>
+                      <td style={{ padding: "0.5rem" }}>{l.student_name}</td>
+                      <td style={{ padding: "0.5rem" }}>{l.duration}</td>
+                      <td style={{ padding: "0.5rem" }}>
+                        <span style={{ 
+                          color: l.status === 'completed' ? 'var(--success)' : 'var(--danger)',
+                          fontSize: "0.8rem",
+                          fontWeight: 600
+                        }}>{l.status.toUpperCase()}</span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
