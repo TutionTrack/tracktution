@@ -7,6 +7,7 @@ export default function Register() {
   const [password, setPassword] = useState("");
   const [otp, setOtp] = useState("");
 
+  const [showPassword, setShowPassword] = useState(false);
   const [step, setStep] = useState(1);
   const [msg, setMsg] = useState("");
   const navigate = useNavigate();
@@ -61,7 +62,33 @@ export default function Register() {
             </div>
             <div className="form-group">
               <label className="form-label">Password</label>
-              <input type="password" required className="form-input" value={password} onChange={(e) => setPassword(e.target.value)} />
+              <div style={{ position: "relative" }}>
+                <input 
+                  type={showPassword ? "text" : "password"} 
+                  required 
+                  className="form-input" 
+                  value={password} 
+                  onChange={(e) => setPassword(e.target.value)} 
+                />
+                <button 
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{
+                    position: "absolute",
+                    right: "10px",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    background: "none",
+                    border: "none",
+                    color: "var(--primary)",
+                    cursor: "pointer",
+                    fontSize: "0.8rem",
+                    fontWeight: 600
+                  }}
+                >
+                  {showPassword ? "Hide" : "Show"}
+                </button>
+              </div>
             </div>
             <button type="submit" className="btn btn-primary" style={{ width: "100%" }}>Register</button>
           </form>
