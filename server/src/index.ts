@@ -30,9 +30,14 @@ app.get('*', (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 
-sequelize.sync({ alter: true }).then(() => {
-  console.log('Database synced');
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+sequelize.sync({ alter: true })
+  .then(() => {
+    console.log('Database synced successfully');
+  })
+  .catch((err) => {
+    console.error('Database connection failed:', err);
   });
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
