@@ -23,14 +23,13 @@ if ($action === 'register') {
         // Send OTP via Email
         $subject = "Your TrackTution Verification Code";
         $message = "Hello $name,\n\nYour verification code is: $otp\n\nPlease enter this code to activate your account.";
-        $headers = "From: noreply@tracktution.sujaykrishna.in";
+        $headers = "From: support@tracktution.sujaykrishna.in\r\n";
+        $headers .= "Reply-To: support@tracktution.sujaykrishna.in\r\n";
+        $headers .= "X-Mailer: PHP/" . phpversion();
         
         mail($email, $subject, $message, $headers);
         
-        echo json_encode([
-            "message" => "OTP sent (Debug: Check your email or use code: $otp)",
-            "otp_debug" => $otp 
-        ]);
+        echo json_encode(["message" => "OTP sent to your email."]);
     } catch (Exception $e) {
         echo json_encode(["error" => "User already exists or error: " . $e->getMessage()]);
     }
