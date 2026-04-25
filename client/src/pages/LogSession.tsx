@@ -10,7 +10,7 @@ export default function LogSession() {
   const [comments, setComments] = useState("");
 
   useEffect(() => {
-    fetch("/api/students", {
+    fetch("/api/students.php", {
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
     })
     .then(res => res.json())
@@ -30,7 +30,7 @@ export default function LogSession() {
 
   const handleLog = async (e: React.FormEvent) => {
     e.preventDefault();
-    const res = await fetch("/api/logs", {
+    const res = await fetch("/api/logs.php", {
       method: "POST",
       headers: { 
         "Content-Type": "application/json",

@@ -5,7 +5,7 @@ export default function Sessions() {
 
   useEffect(() => {
     const fetchSessions = async () => {
-      const res = await fetch("/api/sessions", {
+      const res = await fetch("/api/sessions.php", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
       });
       if (res.ok) {

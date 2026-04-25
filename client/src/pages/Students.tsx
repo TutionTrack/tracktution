@@ -5,7 +5,7 @@ export default function Students() {
 
   useEffect(() => {
     const fetchStudents = async () => {
-      const res = await fetch("/api/students", {
+      const res = await fetch("/api/students.php", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
       });
       if (res.ok) {

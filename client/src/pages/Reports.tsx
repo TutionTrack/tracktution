@@ -4,7 +4,7 @@ export default function Reports() {
   const [reportText, setReportText] = useState("");
 
   const generateReport = async () => {
-    const res = await fetch("/api/reports", {
+    const res = await fetch("/api/reports.php", {
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
     });
     if (res.ok) {
