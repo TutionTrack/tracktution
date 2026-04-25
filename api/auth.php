@@ -20,8 +20,14 @@ if ($action === 'register') {
         $stmt = $pdo->prepare("INSERT INTO EmailOTPs (user_id, otp, type) VALUES (?, ?, 'verification')");
         $stmt->execute([$userId, $otp]);
         
-        // In a real app, send email here. For now, we return it for testing.
-        echo json_encode(["message" => "OTP sent to email", "otp_debug" => $otp]);
+        // Send OTP via Email
+        $subject = "Your TrackTution Verification Code";
+        $message = "Hello $name,\n\nYour verification code is: $otp\n\nPlease enter this code to activate your account.";
+        $headers = "From: noreply@tracktution.sujaykrishna.in";
+        
+        mail($email, $subject, $message, $headers);
+        
+        echo json_encode(["message" => "OTP sent to email"]);
     } catch (Exception $e) {
         echo json_encode(["error" => "User already exists or error: " . $e->getMessage()]);
     }
