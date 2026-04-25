@@ -6,7 +6,7 @@ export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [otp, setOtp] = useState("");
-  const [userId, setUserId] = useState<number | null>(null);
+
   const [step, setStep] = useState(1);
   const [msg, setMsg] = useState("");
   const navigate = useNavigate();
