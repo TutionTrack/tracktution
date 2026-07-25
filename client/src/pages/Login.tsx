@@ -32,6 +32,7 @@ export default function Login() {
       const data = await res.json();
       if (res.ok) {
         localStorage.setItem("token", data.token);
+        localStorage.setItem("isAdmin", data.user.is_admin ? "1" : "0");
         navigate("/dashboard");
       } else {
         setError(data.error);

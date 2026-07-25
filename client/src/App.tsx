@@ -6,12 +6,14 @@ import Students from "./pages/Students";
 import Sessions from "./pages/Sessions";
 import LogSession from "./pages/LogSession";
 import Reports from "./pages/Reports";
+import Admin from "./pages/Admin";
 import "./index.css";
 
 const AuthLayout = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
   const handleLogout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("isAdmin");
     window.location.href = "/";
   };
 
@@ -24,6 +26,9 @@ const AuthLayout = ({ children }: { children: React.ReactNode }) => {
         <Link to="/sessions" className={`sidebar-link ${location.pathname === "/sessions" ? "active" : ""}`}>Sessions</Link>
         <Link to="/log-session" className={`sidebar-link ${location.pathname === "/log-session" ? "active" : ""}`}>Log Session</Link>
         <Link to="/reports" className={`sidebar-link ${location.pathname === "/reports" ? "active" : ""}`}>Reports</Link>
+        {localStorage.getItem("isAdmin") === "1" && (
+          <Link to="/admin" className={`sidebar-link ${location.pathname === "/admin" ? "active" : ""}`}>Admin Panel</Link>
+        )}
         <button onClick={handleLogout} className="sidebar-link" style={{ background: "none", border: "none", cursor: "pointer", textAlign: "left" }}>Logout</button>
       </aside>
       <main className="main-content">
@@ -55,6 +60,7 @@ function App() {
         <Route path="/sessions" element={<PrivateRoute><Sessions /></PrivateRoute>} />
         <Route path="/log-session" element={<PrivateRoute><LogSession /></PrivateRoute>} />
         <Route path="/reports" element={<PrivateRoute><Reports /></PrivateRoute>} />
+        <Route path="/admin" element={<PrivateRoute><Admin /></PrivateRoute>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>

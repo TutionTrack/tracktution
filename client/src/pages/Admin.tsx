@@ -1,0 +1,210 @@
+import { useEffect, useState } from "react";
+
+export default function Admin() {
+  const [data, setData] = useState<any>(null);
+  const [error, setError] = useState("");
+
+  const checkAuth = (status: number) => {
+    if (status === 401) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("isAdmin");
+      window.location.href = "/";
+      return true;
+    }
+    return false;
+  };
+
+  const fetchAdminData = async () => {
+    try {
+      const res = await fetch("/api/admin.php", {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+      });
+      if (checkAuth(res.status)) return;
+      if (res.ok) {
+        setData(await res.json());
+      } else {
+        const errData = await res.json();
+        setError(errData.error || "Failed to load admin data");
+      }
+    } catch (err) {
+      setError("Failed to connect to server");
+    }
+  };
+
+  useEffect(() => {
+    fetchAdminData();
+  }, []);
+
+  const handleToggleStatus = async (userId: number) => {
+    setError("");
+    try {
+      const res = await fetch("/api/admin.php", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`
+        },
+        body: JSON.stringify({ action: "toggle_active", user_id: userId })
+      });
+      if (checkAuth(res.status)) return;
+      if (res.ok) {
+        fetchAdminData();
+      } else {
+        const errData = await res.json();
+        setError(errData.error || "Failed to update status");
+      }
+    } catch (err) {
+      setError("Failed to update status");
+    }
+  };
+
+  const handleDeleteUser = async (userId: number) => {
+    if (!confirm("WARNING: Are you sure you want to delete this user? This will permanently delete their account, students, scheduled sessions, and teaching logs. This action cannot be undone.")) return;
+    setError("");
+    try {
+      const res = await fetch("/api/admin.php", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`
+        },
+        body: JSON.stringify({ action: "delete_user", user_id: userId })
+      });
+      if (checkAuth(res.status)) return;
+      if (res.ok) {
+        fetchAdminData();
+      } else {
+        const errData = await res.json();
+        setError(errData.error || "Failed to delete user");
+      }
+    } catch (err) {
+      setError("Failed to delete user");
+    }
+  };
+
+  if (error) {
+    return (
+      <div style={{ padding: "2rem", color: "var(--danger)", textAlign: "center" }}>
+        <h3>Error</h3>
+        <p>{error}</p>
+      </div>
+    );
+  }
+
+  if (!data) return <div>Loading Admin Panel...</div>;
+
+  return (
+    <div>
+      <div className="page-header">
+        <h1 className="page-title">Admin Panel</h1>
+        <p className="subtitle">System-wide analytics and user management.</p>
+      </div>
+
+      {/* Admin Stats Grid */}
+      <div className="dashboard-grid" style={{ marginBottom: "2rem" }}>
+        <div className="stat-card">
+          <div className="stat-title">Total Teachers</div>
+          <div className="stat-value">{data.stats.totalTeachers}</div>
+          <div style={{ fontSize: "0.85rem", color: "var(--text-muted)", marginTop: "0.25rem" }}>
+            {data.stats.totalActiveTeachers} Active accounts
+          </div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-title">Total Students</div>
+          <div className="stat-value" style={{ color: "var(--accent)" }}>{data.stats.totalStudents}</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-title">Total Scheduled Sessions</div>
+          <div className="stat-value" style={{ color: "#f59e0b" }}>{data.stats.totalSessions}</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-title">Total Logs Logged</div>
+          <div className="stat-value" style={{ color: "var(--success)" }}>{data.stats.totalLogs}</div>
+        </div>
+      </div>
+
+      {/* Users List Card */}
+      <div className="card">
+        <h3 style={{ marginBottom: "1.5rem", color: "var(--primary)" }}>Registered Teachers</h3>
+        <div className="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Registration Date</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.teachers.map((teacher: any) => (
+                <tr key={teacher.id}>
+                  <td>{teacher.id}</td>
+                  <td style={{ fontWeight: 600 }}>{teacher.name}</td>
+                  <td>{teacher.email}</td>
+                  <td>{new Date(teacher.created_at).toLocaleDateString()}</td>
+                  <td>
+                    <span style={{ 
+                      fontSize: "0.8rem", 
+                      fontWeight: 600, 
+                      padding: "0.2rem 0.5rem", 
+                      borderRadius: "4px",
+                      background: teacher.is_admin ? "rgba(30, 58, 138, 0.1)" : "rgba(100, 116, 139, 0.1)",
+                      color: teacher.is_admin ? "var(--primary)" : "var(--text-muted)"
+                    }}>
+                      {teacher.is_admin ? "Admin" : "Teacher"}
+                    </span>
+                  </td>
+                  <td>
+                    <span style={{ 
+                      fontSize: "0.8rem", 
+                      fontWeight: 600, 
+                      padding: "0.2rem 0.5rem", 
+                      borderRadius: "4px",
+                      background: teacher.is_active ? "rgba(16, 185, 129, 0.1)" : "rgba(239, 68, 68, 0.1)",
+                      color: teacher.is_active ? "var(--success)" : "var(--danger)"
+                    }}>
+                      {teacher.is_active ? "Active" : "Inactive"}
+                    </span>
+                  </td>
+                  <td>
+                    <button 
+                      onClick={() => handleToggleStatus(teacher.id)}
+                      className="btn"
+                      style={{ 
+                        padding: "0.25rem 0.5rem", 
+                        fontSize: "0.85rem", 
+                        color: teacher.is_active ? "var(--danger)" : "var(--success)", 
+                        marginRight: "0.5rem",
+                        background: "none",
+                        border: "1px solid var(--surface-border)"
+                      }}
+                    >
+                      {teacher.is_active ? "Deactivate" : "Activate"}
+                    </button>
+                    <button 
+                      onClick={() => handleDeleteUser(teacher.id)}
+                      className="btn"
+                      style={{ 
+                        padding: "0.25rem 0.5rem", 
+                        fontSize: "0.85rem", 
+                        color: "var(--danger)",
+                        background: "none",
+                        border: "1px solid var(--surface-border)"
+                      }}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
