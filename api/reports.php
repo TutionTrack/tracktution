@@ -2,11 +2,22 @@
 require_once 'config.php';
 $userId = getAuthUser();
 
-$stmt = $pdo->prepare("SELECT l.*, s.name as student_name FROM SessionLogs l JOIN Students s ON l.student_id = s.id WHERE s.teacher_id = ?");
-$stmt->execute([$userId]);
+$startDate = $_GET['start_date'] ?? null;
+$endDate = $_GET['end_date'] ?? null;
+
+if ($startDate && $endDate) {
+    $stmt = $pdo->prepare("SELECT l.*, s.name as student_name FROM SessionLogs l JOIN Students s ON l.student_id = s.id WHERE s.teacher_id = ? AND l.date >= ? AND l.date <= ? ORDER BY l.date ASC");
+    $stmt->execute([$userId, $startDate, $endDate]);
+} else {
+    $stmt = $pdo->prepare("SELECT l.*, s.name as student_name FROM SessionLogs l JOIN Students s ON l.student_id = s.id WHERE s.teacher_id = ? ORDER BY l.date ASC");
+    $stmt->execute([$userId]);
+}
 $logs = $stmt->fetchAll();
 
 $report = "TUITION SESSION REPORT\n";
+if ($startDate && $endDate) {
+    $report .= "Period: $startDate to $endDate\n";
+}
 $report .= "Generated on: " . date('Y-m-d H:i:s') . "\n";
 $report .= str_repeat("-", 40) . "\n\n";
 
