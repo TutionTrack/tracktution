@@ -4,6 +4,7 @@ export default function Donate() {
   const [settings, setSettings] = useState<any>(null);
   const [error, setError] = useState("");
   const [donateAmount, setDonateAmount] = useState("100");
+  const [isMobile, setIsMobile] = useState(false);
 
   const checkAuth = (status: number) => {
     if (status === 401) {
@@ -16,6 +17,10 @@ export default function Donate() {
   };
 
   useEffect(() => {
+    // Detect mobile device
+    const mobileCheck = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    setIsMobile(mobileCheck);
+
     fetch("/api/settings.php", {
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
     })
@@ -45,6 +50,10 @@ export default function Donate() {
   const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(
     `upi://pay?pa=${settings.donation_upi}&pn=Tuition%20Tracker%20Support&cu=INR`
   )}`;
+
+  const handleUpiClick = () => {
+    window.location.href = upiUrl;
+  };
 
   return (
     <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "calc(100vh - 120px)", padding: "1rem" }}>
@@ -120,30 +129,36 @@ export default function Donate() {
             <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "0.5rem" }}>Scan with GPay, PhonePe, or Paytm</span>
           </div>
 
-          {/* Option B: Mobile UPI Intent / Paypal */}
+          {/* Option B: Mobile UPI Intent / Paypal / Card links */}
           <div style={{ display: "flex", flexDirection: "column", gap: "1rem", justifyContent: "center", alignItems: "center" }}>
-            <h4 style={{ color: "var(--primary)", fontSize: "0.9rem", marginBottom: "0.25rem" }}>Option B: Pay Instantly</h4>
+            <h4 style={{ color: "var(--primary)", fontSize: "0.9rem", marginBottom: "0.25rem" }}>Option B: Pay Online</h4>
             
-            {/* UPI Mobile Intent link */}
-            <a
-              href={upiUrl}
-              className="btn btn-primary"
-              style={{
-                width: "100%",
-                maxWidth: "200px",
-                padding: "0.75rem 1rem",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "0.5rem",
-                textDecoration: "none",
-                background: "linear-gradient(135deg, #10b981, #059669)",
-                borderColor: "transparent",
-                fontWeight: 600
-              }}
-            >
-              📱 UPI App (GPay/PhonePe)
-            </a>
+            {/* UPI Mobile Intent link (Only shown on mobile devices since it won't work on laptops) */}
+            {isMobile ? (
+              <button
+                onClick={handleUpiClick}
+                className="btn btn-primary"
+                style={{
+                  width: "100%",
+                  maxWidth: "220px",
+                  padding: "0.75rem 1rem",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "0.5rem",
+                  background: "linear-gradient(135deg, #10b981, #059669)",
+                  borderColor: "transparent",
+                  fontWeight: 600,
+                  cursor: "pointer"
+                }}
+              >
+                📱 Open UPI App (GPay/PhonePe)
+              </button>
+            ) : (
+              <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", fontStyle: "italic", textAlign: "center" }}>
+                Use GPay/PhonePe on your phone to scan the QR code.
+              </span>
+            )}
 
             {/* Paypal Button */}
             <a
@@ -153,7 +168,7 @@ export default function Donate() {
               className="btn"
               style={{
                 width: "100%",
-                maxWidth: "200px",
+                maxWidth: "220px",
                 padding: "0.75rem 1rem",
                 display: "flex",
                 alignItems: "center",
@@ -164,10 +179,10 @@ export default function Donate() {
                 border: "1px solid var(--surface-border)"
               }}
             >
-              💳 PayPal Link
+              💳 Pay with PayPal
             </a>
 
-            {/* Stripe / Apple Pay Button */}
+            {/* Universal custom link (e.g. Stripe / Razorpay link) */}
             {settings.donation_custom && settings.donation_custom !== 'your-custom-link' && settings.donation_custom !== '' && (
               <a
                 href={settings.donation_custom}
@@ -176,7 +191,7 @@ export default function Donate() {
                 className="btn btn-primary"
                 style={{
                   width: "100%",
-                  maxWidth: "200px",
+                  maxWidth: "220px",
                   padding: "0.75rem 1rem",
                   display: "flex",
                   alignItems: "center",
@@ -188,13 +203,9 @@ export default function Donate() {
                   fontWeight: 600
                 }}
               >
-                 Apple Pay / Stripe
+                🌐 Credit Card / NetBanking
               </a>
             )}
-
-            <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", textAlign: "center" }}>
-              Mobile buttons redirect you directly to safe apps to pay.
-            </span>
           </div>
 
         </div>

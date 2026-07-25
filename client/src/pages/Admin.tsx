@@ -268,14 +268,14 @@ export default function Admin() {
             </div>
 
             <div className="form-group" style={{ margin: 0 }}>
-              <label className="form-label" style={{ fontSize: "0.85rem", marginBottom: "0.25rem" }}>Stripe / Custom Donation Link (Apple Pay)</label>
+              <label className="form-label" style={{ fontSize: "0.85rem", marginBottom: "0.25rem" }}>Universal Donation Link (Stripe, Razorpay, etc.)</label>
               <input 
-                placeholder="https://donate.stripe.com/..." 
+                placeholder="https://donate.stripe.com/... or https://pages.razorpay.com/..." 
                 className="form-input" 
                 value={settings.donation_custom} 
                 onChange={e => setSettings({...settings, donation_custom: e.target.value})} 
               />
-              <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>Paste your Stripe Payment Link, Ko-fi, or custom URL here.</span>
+              <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>Paste your Stripe Payment Link, Razorpay Payment Page, or custom URL here.</span>
             </div>
 
             <button type="submit" className="btn btn-primary" style={{ marginTop: "0.5rem" }}>Save Settings</button>
