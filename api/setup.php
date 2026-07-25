@@ -81,6 +81,7 @@ try {
     // Populate default masked settings placeholders
     $pdo->exec("INSERT IGNORE INTO SystemSettings (key_name, val) VALUES ('donation_upi', 'your-upi-id@bank')");
     $pdo->exec("INSERT IGNORE INTO SystemSettings (key_name, val) VALUES ('donation_paypal', 'your-paypal-username')");
+    $pdo->exec("INSERT IGNORE INTO SystemSettings (key_name, val) VALUES ('donation_custom', 'your-custom-link')");
     
     echo json_encode(["message" => "Database setup and upgraded successfully"]);
 } catch (PDOException $e) {
