@@ -7,6 +7,7 @@ import Sessions from "./pages/Sessions";
 import LogSession from "./pages/LogSession";
 import Reports from "./pages/Reports";
 import Admin from "./pages/Admin";
+import Donate from "./pages/Donate";
 import "./index.css";
 
 const AuthLayout = ({ children }: { children: React.ReactNode }) => {
@@ -29,6 +30,7 @@ const AuthLayout = ({ children }: { children: React.ReactNode }) => {
         {localStorage.getItem("isAdmin") === "1" && (
           <Link to="/admin" className={`sidebar-link ${location.pathname === "/admin" ? "active" : ""}`}>Admin Panel</Link>
         )}
+        <Link to="/donate" className={`sidebar-link ${location.pathname === "/donate" ? "active" : ""}`} style={{ color: "#f59e0b", fontWeight: "600" }}>💖 Donate</Link>
         <button onClick={handleLogout} className="sidebar-link" style={{ background: "none", border: "none", cursor: "pointer", textAlign: "left" }}>Logout</button>
       </aside>
       <main className="main-content">
@@ -61,6 +63,7 @@ function App() {
         <Route path="/log-session" element={<PrivateRoute><LogSession /></PrivateRoute>} />
         <Route path="/reports" element={<PrivateRoute><Reports /></PrivateRoute>} />
         <Route path="/admin" element={<PrivateRoute><Admin /></PrivateRoute>} />
+        <Route path="/donate" element={<PrivateRoute><Donate /></PrivateRoute>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
