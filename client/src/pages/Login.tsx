@@ -140,7 +140,13 @@ export default function Login() {
 
       {/* Interactive Right Auth Panel */}
       <div className="landing-auth-side">
-        <div className="auth-box" style={{ boxShadow: 'none', border: '1px solid var(--surface-border)' }}>
+        <div style={{ width: "100%", maxWidth: "400px" }}>
+          <div className="mobile-logo-header" style={{ textAlign: "center", marginBottom: "2rem" }}>
+            <h1 style={{ color: "var(--primary)", fontSize: "2.25rem", fontWeight: 800, letterSpacing: "-0.05em" }}>Tuition Tracker</h1>
+            <p style={{ color: "var(--text-muted)", fontSize: "0.9rem", marginTop: "0.25rem" }}>Independent Educator Platform</p>
+          </div>
+          
+          <div className="auth-box" style={{ boxShadow: 'none', border: '1px solid var(--surface-border)', maxWidth: 'none' }}>
           {view === 'login' && (
             <>
               <h2 className="page-title" style={{ textAlign: "center", marginBottom: "0.5rem" }}>Welcome Back</h2>
@@ -286,6 +292,7 @@ export default function Login() {
             </>
           )}
         </div>
+      </div>
       </div>
     </div>
   );

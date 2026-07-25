@@ -321,6 +321,10 @@ th {
   line-height: 1.5;
 }
 
+.mobile-logo-header {
+  display: none;
+}
+
 .landing-auth-side {
   flex: 1;
   display: flex;
@@ -333,19 +337,23 @@ th {
 @media (max-width: 992px) {
   .landing-container {
     flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem 1rem;
   }
   
   .landing-info-side {
-    padding: 3rem 2rem;
-    flex: none;
+    display: none;
   }
   
-  .landing-tagline {
-    margin-bottom: 2rem;
+  .mobile-logo-header {
+    display: block;
   }
   
   .landing-auth-side {
-    padding: 2rem 1rem;
+    width: 100%;
+    max-width: 440px;
+    padding: 0;
   }
 }
 
