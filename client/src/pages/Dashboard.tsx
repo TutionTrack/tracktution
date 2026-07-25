@@ -26,7 +26,7 @@ export default function Dashboard() {
           <div className="stat-value">{data.stats.totalStudents}</div>
         </div>
         <div className="stat-card">
-          <div className="stat-title">Upcoming Sessions</div>
+          <div className="stat-title">Upcoming (This Week)</div>
           <div className="stat-value" style={{ color: "#f59e0b" }}>{data.upcoming.length}</div>
         </div>
         <div className="stat-card">
@@ -41,9 +41,12 @@ export default function Dashboard() {
       
       <div className="dashboard-flex-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem", marginTop: "1.5rem" }}>
         <div className="card">
-          <h3 style={{ marginBottom: "1rem", color: "var(--primary)" }}>Upcoming Sessions</h3>
+          <h3 style={{ marginBottom: "1rem", color: "var(--primary)" }}>Upcoming Sessions (This Week)</h3>
           {data.upcoming.length === 0 ? (
-            <p style={{ color: "var(--text-muted)" }}>No upcoming sessions scheduled.</p>
+            <div style={{ textAlign: "center", padding: "2rem 0" }}>
+              <p style={{ color: "var(--text-muted)", marginBottom: "1rem" }}>No sessions scheduled for this week.</p>
+              <a href="/sessions" className="btn btn-primary" style={{ padding: "0.5rem 1rem", fontSize: "0.9rem", textDecoration: "none" }}>Schedule Session</a>
+            </div>
           ) : (
             <div className="table-responsive">
               <table style={{ width: "100%", textAlign: "left", fontSize: "0.9rem" }}>
@@ -59,7 +62,7 @@ export default function Dashboard() {
                     <tr key={s.id} style={{ borderBottom: "1px solid var(--border)" }}>
                       <td style={{ padding: "0.5rem" }}>{s.student_name}</td>
                       <td style={{ padding: "0.5rem" }}>{s.date}</td>
-                      <td style={{ padding: "0.5rem" }}>{s.start_time}</td>
+                      <td style={{ padding: "0.5rem" }}>{s.start_time.substring(0, 5)} - {s.end_time.substring(0, 5)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -69,31 +72,28 @@ export default function Dashboard() {
         </div>
 
         <div className="card">
-          <h3 style={{ marginBottom: "1rem", color: "var(--primary)" }}>Recent Logs</h3>
-          {data.recent.length === 0 ? (
-            <p style={{ color: "var(--text-muted)" }}>No sessions logged yet.</p>
+          <h3 style={{ marginBottom: "1rem", color: "var(--primary)" }}>My Students</h3>
+          {data.students.length === 0 ? (
+            <div style={{ textAlign: "center", padding: "2rem 0" }}>
+              <p style={{ color: "var(--text-muted)", marginBottom: "1rem" }}>No students added yet.</p>
+              <a href="/students" className="btn btn-primary" style={{ padding: "0.5rem 1rem", fontSize: "0.9rem", textDecoration: "none" }}>Add Student</a>
+            </div>
           ) : (
             <div className="table-responsive">
               <table style={{ width: "100%", textAlign: "left", fontSize: "0.9rem" }}>
                 <thead>
                   <tr style={{ color: "var(--text-muted)", borderBottom: "1px solid var(--border)" }}>
-                    <th style={{ padding: "0.5rem" }}>Student</th>
-                    <th style={{ padding: "0.5rem" }}>Duration</th>
-                    <th style={{ padding: "0.5rem" }}>Status</th>
+                    <th style={{ padding: "0.5rem" }}>Name</th>
+                    <th style={{ padding: "0.5rem" }}>Grade</th>
+                    <th style={{ padding: "0.5rem" }}>Board</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {data.recent.map((l: any) => (
-                    <tr key={l.id} style={{ borderBottom: "1px solid var(--border)" }}>
-                      <td style={{ padding: "0.5rem" }}>{l.student_name}</td>
-                      <td style={{ padding: "0.5rem" }}>{l.duration}</td>
-                      <td style={{ padding: "0.5rem" }}>
-                        <span style={{ 
-                          color: l.status === 'completed' ? 'var(--success)' : 'var(--danger)',
-                          fontSize: "0.8rem",
-                          fontWeight: 600
-                        }}>{l.status.toUpperCase()}</span>
-                      </td>
+                  {data.students.map((st: any) => (
+                    <tr key={st.id} style={{ borderBottom: "1px solid var(--border)" }}>
+                      <td style={{ padding: "0.5rem", fontWeight: 500 }}>{st.name}</td>
+                      <td style={{ padding: "0.5rem" }}>{st.grade}</td>
+                      <td style={{ padding: "0.5rem" }}>{st.board}</td>
                     </tr>
                   ))}
                 </tbody>

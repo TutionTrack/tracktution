@@ -37,7 +37,7 @@ export default function Register() {
     });
     if (res.ok) {
       alert("Registration successful. Please login.");
-      navigate("/login");
+      navigate("/");
     } else {
       const data = await res.json();
       setMsg(data.error);
@@ -102,7 +102,7 @@ export default function Register() {
           </form>
         )}
         <div style={{ marginTop: "1.5rem", textAlign: "center", fontSize: "0.9rem" }}>
-          Already have an account? <Link to="/login" style={{ color: "var(--primary)", fontWeight: 600 }}>Login</Link>
+          Already have an account? <Link to="/" style={{ color: "var(--primary)", fontWeight: 600 }}>Login</Link>
         </div>
       </div>
     </div>
