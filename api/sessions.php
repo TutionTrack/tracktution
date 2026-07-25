@@ -44,7 +44,9 @@ if ($method === 'POST') {
     $stmt->execute([$data['student_id']]);
     $student = $stmt->fetch();
     
-    if ($teacher && $student) {
+    $sendEmail = $data['send_email'] ?? false;
+    
+    if ($sendEmail && $teacher && $student) {
         $teacherEmail = $teacher['email'];
         $teacherName = $teacher['name'];
         $studentName = $student['name'];

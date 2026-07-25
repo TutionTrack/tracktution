@@ -29,6 +29,18 @@ $stmt = $pdo->prepare("SELECT * FROM Students WHERE teacher_id = ? ORDER BY name
 $stmt->execute([$userId]);
 $studentsList = $stmt->fetchAll();
 
+// All Sessions for the Calendar (past 30 days and all future)
+$stmt = $pdo->prepare("
+    SELECT s.*, st.name as student_name 
+    FROM Sessions s 
+    JOIN Students st ON s.student_id = st.id 
+    WHERE st.teacher_id = ? 
+      AND s.date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY) 
+    ORDER BY s.date, s.start_time
+");
+$stmt->execute([$userId]);
+$calendarSessions = $stmt->fetchAll();
+
 echo json_encode([
     "stats" => [
         "totalStudents" => $totalStudents,
@@ -38,6 +50,7 @@ echo json_encode([
     ],
     "upcoming" => $upcoming,
     "recent" => $recent,
-    "students" => $studentsList
+    "students" => $studentsList,
+    "calendarSessions" => $calendarSessions
 ]);
 ?>
