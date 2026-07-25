@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS Users (
     email VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     is_active TINYINT(1) DEFAULT 0,
+    is_admin TINYINT(1) DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -61,7 +62,18 @@ CREATE TABLE IF NOT EXISTS EmailOTPs (
 
 try {
     $pdo->exec($sql);
-    echo json_encode(["message" => "Database setup successfully"]);
+    
+    // Add is_admin column to existing databases if it is missing
+    try {
+        $pdo->exec("ALTER TABLE Users ADD COLUMN is_admin TINYINT(1) DEFAULT 0");
+    } catch (PDOException $e) {
+        // Column already exists
+    }
+    
+    // Automatically make the first user account (id=1) an admin
+    $pdo->exec("UPDATE Users SET is_admin = 1 WHERE id = 1");
+    
+    echo json_encode(["message" => "Database setup and upgraded successfully"]);
 } catch (PDOException $e) {
     echo json_encode(["error" => "Setup failed: " . $e->getMessage()]);
 }

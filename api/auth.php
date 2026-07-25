@@ -75,7 +75,15 @@ if ($action === 'login') {
     
     if ($user && password_verify($password, $user['password'])) {
         $token = generateToken($user['id']);
-        echo json_encode(["token" => $token, "user" => ["id" => $user['id'], "name" => $user['name'], "email" => $user['email']]]);
+        echo json_encode([
+            "token" => $token, 
+            "user" => [
+                "id" => $user['id'], 
+                "name" => $user['name'], 
+                "email" => $user['email'],
+                "is_admin" => (int)$user['is_admin']
+            ]
+        ]);
     } else {
         http_response_code(401);
         echo json_encode(["error" => "Invalid credentials or account not active"]);
