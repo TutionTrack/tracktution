@@ -5,6 +5,8 @@ export default function Sessions() {
   const [students, setStudents] = useState<any[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [newSession, setNewSession] = useState({ student_id: "", subject: "", date: "", start_time: "", end_time: "", recurring_type: "none" });
+  const [error, setError] = useState("");
+  const [sendEmail, setSendEmail] = useState(true);
 
   const checkAuth = (status: number) => {
     if (status === 401) {
@@ -31,19 +33,24 @@ export default function Sessions() {
 
   const handleSchedule = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
     const res = await fetch("/api/sessions.php", {
       method: "POST",
       headers: { 
         "Content-Type": "application/json",
         Authorization: `Bearer ${localStorage.getItem("token")}` 
       },
-      body: JSON.stringify(newSession)
+      body: JSON.stringify({ ...newSession, send_email: sendEmail })
     });
     if (checkAuth(res.status)) return;
+    const data = await res.json();
     if (res.ok) {
       setShowForm(false);
       setNewSession({ student_id: "", subject: "", date: "", start_time: "", end_time: "", recurring_type: "none" });
+      setError("");
       fetchData();
+    } else {
+      setError(data.error || "Failed to schedule session");
     }
   };
 
@@ -64,7 +71,7 @@ export default function Sessions() {
           <h1 className="page-title">Sessions</h1>
           <p className="subtitle">Schedule and view upcoming tuition sessions.</p>
         </div>
-        <button className="btn btn-primary" onClick={() => setShowForm(true)}>+ Schedule Session</button>
+        <button className="btn btn-primary" onClick={() => { setShowForm(true); setError(""); }}>+ Schedule Session</button>
       </div>
 
       {showForm && (
@@ -80,6 +87,7 @@ export default function Sessions() {
         }}>
           <div className="card" style={{ width: "100%", maxWidth: "500px", boxShadow: "0 20px 25px -5px rgba(0,0,0,0.1)" }}>
             <h3 style={{ marginBottom: "1.5rem", color: "var(--primary)" }}>Schedule Session</h3>
+            {error && <div className="error-text" style={{ marginBottom: "1rem", color: "var(--danger)", fontWeight: 500, fontSize: "0.9rem" }}>{error}</div>}
             <form onSubmit={handleSchedule} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
               <select required className="form-input" value={newSession.student_id} onChange={e => setNewSession({...newSession, student_id: e.target.value})}>
                 <option value="">Select Student</option>
@@ -97,6 +105,10 @@ export default function Sessions() {
                 <option value="biweekly">Bi-weekly</option>
                 <option value="monthly">Monthly</option>
               </select>
+              <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.9rem", cursor: "pointer", userSelect: "none", margin: "0.25rem 0" }}>
+                <input type="checkbox" checked={sendEmail} onChange={e => setSendEmail(e.target.checked)} style={{ cursor: "pointer" }} />
+                <span>Send email notification to student & teacher</span>
+              </label>
               <div style={{ display: "flex", gap: "1rem", marginTop: "0.5rem" }}>
                 <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>Schedule</button>
                 <button type="button" className="btn" style={{ flex: 1 }} onClick={() => setShowForm(false)}>Cancel</button>
