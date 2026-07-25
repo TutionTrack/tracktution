@@ -4,17 +4,32 @@ $userId = getAuthUser();
 
 $startDate = $_GET['start_date'] ?? null;
 $endDate = $_GET['end_date'] ?? null;
+$studentId = $_GET['student_id'] ?? null;
+
+$sql = "SELECT l.*, s.name as student_name FROM SessionLogs l JOIN Students s ON l.student_id = s.id WHERE s.teacher_id = ?";
+$params = [$userId];
 
 if ($startDate && $endDate) {
-    $stmt = $pdo->prepare("SELECT l.*, s.name as student_name FROM SessionLogs l JOIN Students s ON l.student_id = s.id WHERE s.teacher_id = ? AND l.date >= ? AND l.date <= ? ORDER BY l.date ASC");
-    $stmt->execute([$userId, $startDate, $endDate]);
-} else {
-    $stmt = $pdo->prepare("SELECT l.*, s.name as student_name FROM SessionLogs l JOIN Students s ON l.student_id = s.id WHERE s.teacher_id = ? ORDER BY l.date ASC");
-    $stmt->execute([$userId]);
+    $sql .= " AND l.date >= ? AND l.date <= ?";
+    $params[] = $startDate;
+    $params[] = $endDate;
 }
+
+if ($studentId && $studentId !== 'all' && $studentId !== '') {
+    $sql .= " AND l.student_id = ?";
+    $params[] = $studentId;
+}
+
+$sql .= " ORDER BY l.date ASC";
+
+$stmt = $pdo->prepare($sql);
+$stmt->execute($params);
 $logs = $stmt->fetchAll();
 
 $report = "TUITION SESSION REPORT\n";
+if ($studentId && $studentId !== 'all' && $studentId !== '' && !empty($logs)) {
+    $report .= "Student: " . $logs[0]['student_name'] . "\n";
+}
 if ($startDate && $endDate) {
     $report .= "Period: $startDate to $endDate\n";
 }
