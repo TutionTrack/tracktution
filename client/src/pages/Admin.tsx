@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 export default function Admin() {
   const [data, setData] = useState<any>(null);
-  const [settings, setSettings] = useState({ donation_upi: "", donation_paypal: "" });
+  const [settings, setSettings] = useState({ donation_upi: "", donation_paypal: "", donation_custom: "" });
   const [error, setError] = useState("");
 
   const checkAuth = (status: number) => {
@@ -265,6 +265,17 @@ export default function Admin() {
                 onChange={e => setSettings({...settings, donation_paypal: e.target.value})} 
               />
               <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>Just your username (e.g. paypal.me/USERNAME).</span>
+            </div>
+
+            <div className="form-group" style={{ margin: 0 }}>
+              <label className="form-label" style={{ fontSize: "0.85rem", marginBottom: "0.25rem" }}>Stripe / Custom Donation Link (Apple Pay)</label>
+              <input 
+                placeholder="https://donate.stripe.com/..." 
+                className="form-input" 
+                value={settings.donation_custom} 
+                onChange={e => setSettings({...settings, donation_custom: e.target.value})} 
+              />
+              <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>Paste your Stripe Payment Link, Ko-fi, or custom URL here.</span>
             </div>
 
             <button type="submit" className="btn btn-primary" style={{ marginTop: "0.5rem" }}>Save Settings</button>

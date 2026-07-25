@@ -166,6 +166,32 @@ export default function Donate() {
             >
               💳 PayPal Link
             </a>
+
+            {/* Stripe / Apple Pay Button */}
+            {settings.donation_custom && settings.donation_custom !== 'your-custom-link' && settings.donation_custom !== '' && (
+              <a
+                href={settings.donation_custom}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-primary"
+                style={{
+                  width: "100%",
+                  maxWidth: "200px",
+                  padding: "0.75rem 1rem",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "0.5rem",
+                  textDecoration: "none",
+                  background: "linear-gradient(135deg, #3b82f6, #1d4ed8)",
+                  borderColor: "transparent",
+                  fontWeight: 600
+                }}
+              >
+                 Apple Pay / Stripe
+              </a>
+            )}
+
             <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", textAlign: "center" }}>
               Mobile buttons redirect you directly to safe apps to pay.
             </span>
