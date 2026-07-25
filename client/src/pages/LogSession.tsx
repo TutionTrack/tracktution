@@ -9,12 +9,27 @@ export default function LogSession() {
   const [status, setStatus] = useState("completed");
   const [comments, setComments] = useState("");
 
+  const checkAuth = (status: number) => {
+    if (status === 401) {
+      localStorage.removeItem("token");
+      window.location.href = "/";
+      return true;
+    }
+    return false;
+  };
+
   useEffect(() => {
     fetch("/api/students.php", {
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
     })
-    .then(res => res.json())
-    .then(data => setStudents(data));
+    .then(res => {
+      if (checkAuth(res.status)) return;
+      return res.json();
+    })
+    .then(data => {
+      if (data) setStudents(data);
+    })
+    .catch(err => console.error("Error fetching students:", err));
   }, []);
 
   const calculateDuration = () => {
@@ -46,6 +61,7 @@ export default function LogSession() {
         comments
       })
     });
+    if (checkAuth(res.status)) return;
     if (res.ok) {
       alert("Session logged successfully!");
       setStudentId(""); setDate(""); setStartTime(""); setEndTime(""); setComments("");

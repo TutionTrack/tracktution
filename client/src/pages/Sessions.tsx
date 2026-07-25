@@ -6,11 +6,21 @@ export default function Sessions() {
   const [showForm, setShowForm] = useState(false);
   const [newSession, setNewSession] = useState({ student_id: "", subject: "", date: "", start_time: "", end_time: "", recurring_type: "none" });
 
+  const checkAuth = (status: number) => {
+    if (status === 401) {
+      localStorage.removeItem("token");
+      window.location.href = "/";
+      return true;
+    }
+    return false;
+  };
+
   const fetchData = async () => {
     const [sRes, stRes] = await Promise.all([
       fetch("/api/sessions.php", { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }),
       fetch("/api/students.php", { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } })
     ]);
+    if (checkAuth(sRes.status) || checkAuth(stRes.status)) return;
     if (sRes.ok) setSessions(await sRes.json());
     if (stRes.ok) setStudents(await stRes.json());
   };
@@ -29,6 +39,7 @@ export default function Sessions() {
       },
       body: JSON.stringify(newSession)
     });
+    if (checkAuth(res.status)) return;
     if (res.ok) {
       setShowForm(false);
       setNewSession({ student_id: "", subject: "", date: "", start_time: "", end_time: "", recurring_type: "none" });
@@ -42,6 +53,7 @@ export default function Sessions() {
       method: "DELETE",
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
     });
+    if (checkAuth(res.status)) return;
     if (res.ok) fetchData();
   };
 
@@ -116,10 +128,10 @@ export default function Sessions() {
                     <td>{s.student_name}</td>
                     <td>{s.subject}</td>
                     <td>{s.date}</td>
-                    <td>{s.start_time} - {s.end_time}</td>
+                    <td>{s.start_time.substring(0, 5)} - {s.end_time.substring(0, 5)}</td>
                     <td>{s.recurring_type}</td>
                     <td>
-                      <button onClick={() => handleCancel(s.id)} className="btn btn-danger" style={{ padding: "0.25rem 0.5rem", fontSize: "0.85rem", color: "var(--danger)" }}>Cancel</button>
+                      <button onClick={() => handleCancel(s.id)} className="btn btn-danger" style={{ padding: "0.25rem 0.5rem", fontSize: "0.85rem", color: "white" }}>Cancel</button>
                     </td>
                   </tr>
                 ))}

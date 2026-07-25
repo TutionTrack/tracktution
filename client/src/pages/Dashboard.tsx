@@ -7,8 +7,16 @@ export default function Dashboard() {
     fetch("/api/dashboard.php", {
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
     })
-    .then(res => res.json())
-    .then(setData);
+    .then(res => {
+      if (res.status === 401) {
+        localStorage.removeItem("token");
+        window.location.href = "/";
+        throw new Error("Unauthorized");
+      }
+      return res.json();
+    })
+    .then(setData)
+    .catch(err => console.error("Error fetching dashboard data:", err));
   }, []);
 
   if (!data) return <div>Loading...</div>;

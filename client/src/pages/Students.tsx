@@ -4,11 +4,22 @@ export default function Students() {
   const [students, setStudents] = useState<any[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [newStudent, setNewStudent] = useState({ name: "", email: "", phone: "", board: "", grade: "" });
+  const [editingStudent, setEditingStudent] = useState<any | null>(null);
+
+  const checkAuth = (status: number) => {
+    if (status === 401) {
+      localStorage.removeItem("token");
+      window.location.href = "/";
+      return true;
+    }
+    return false;
+  };
 
   const fetchStudents = async () => {
     const res = await fetch("/api/students.php", {
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
     });
+    if (checkAuth(res.status)) return;
     if (res.ok) {
       setStudents(await res.json());
     }
@@ -28,9 +39,27 @@ export default function Students() {
       },
       body: JSON.stringify(newStudent)
     });
+    if (checkAuth(res.status)) return;
     if (res.ok) {
       setShowForm(false);
       setNewStudent({ name: "", email: "", phone: "", board: "", grade: "" });
+      fetchStudents();
+    }
+  };
+
+  const handleEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const res = await fetch("/api/students.php", {
+      method: "PUT",
+      headers: { 
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}` 
+      },
+      body: JSON.stringify(editingStudent)
+    });
+    if (checkAuth(res.status)) return;
+    if (res.ok) {
+      setEditingStudent(null);
       fetchStudents();
     }
   };
@@ -41,6 +70,7 @@ export default function Students() {
       method: "DELETE",
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
     });
+    if (checkAuth(res.status)) return;
     if (res.ok) fetchStudents();
   };
 
@@ -82,6 +112,34 @@ export default function Students() {
         </div>
       )}
 
+      {editingStudent && (
+        <div style={{
+          position: "fixed",
+          top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: "rgba(0,0,0,0.5)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 1000,
+          padding: "1rem"
+        }}>
+          <div className="card" style={{ width: "100%", maxWidth: "500px", boxShadow: "0 20px 25px -5px rgba(0,0,0,0.1)" }}>
+            <h3 style={{ marginBottom: "1.5rem", color: "var(--primary)" }}>Edit Student</h3>
+            <form onSubmit={handleEdit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+              <input placeholder="Name" required className="form-input" value={editingStudent.name} onChange={e => setEditingStudent({...editingStudent, name: e.target.value})} />
+              <input placeholder="Email" className="form-input" value={editingStudent.email} onChange={e => setEditingStudent({...editingStudent, email: e.target.value})} />
+              <input placeholder="Phone" className="form-input" value={editingStudent.phone} onChange={e => setEditingStudent({...editingStudent, phone: e.target.value})} />
+              <input placeholder="Board (e.g. CBSE)" className="form-input" value={editingStudent.board} onChange={e => setEditingStudent({...editingStudent, board: e.target.value})} />
+              <input placeholder="Grade" className="form-input" value={editingStudent.grade} onChange={e => setEditingStudent({...editingStudent, grade: e.target.value})} />
+              <div style={{ display: "flex", gap: "1rem", marginTop: "0.5rem" }}>
+                <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>Save Changes</button>
+                <button type="button" className="btn" style={{ flex: 1 }} onClick={() => setEditingStudent(null)}>Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       <div className="card">
         {students.length === 0 ? (
           <div style={{ textAlign: "center", padding: "2rem", color: "var(--text-muted)" }}>
@@ -107,6 +165,11 @@ export default function Students() {
                     <td>{s.board}</td>
                     <td>{s.grade}</td>
                     <td>
+                      <button 
+                        onClick={() => setEditingStudent(s)} 
+                        className="btn" 
+                        style={{ padding: "0.25rem 0.5rem", fontSize: "0.85rem", color: "var(--accent)", marginRight: "0.5rem" }}
+                      >Edit</button>
                       <button 
                         onClick={() => handleDelete(s.id)} 
                         className="btn" 

@@ -5,6 +5,15 @@ export default function Reports() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
+  const checkAuth = (status: number) => {
+    if (status === 401) {
+      localStorage.removeItem("token");
+      window.location.href = "/";
+      return true;
+    }
+    return false;
+  };
+
   const generateReport = async () => {
     let url = "/api/reports.php";
     if (startDate && endDate) {
@@ -13,6 +22,7 @@ export default function Reports() {
     const res = await fetch(url, {
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
     });
+    if (checkAuth(res.status)) return;
     if (res.ok) {
       const data = await res.json();
       setReportText(data.text);
