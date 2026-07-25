@@ -58,6 +58,11 @@ CREATE TABLE IF NOT EXISTS EmailOTPs (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES Users(id)
 );
+
+CREATE TABLE IF NOT EXISTS SystemSettings (
+    key_name VARCHAR(255) PRIMARY KEY,
+    val TEXT
+);
 ";
 
 try {
@@ -72,6 +77,10 @@ try {
     
     // Automatically make the first user account (id=1) an admin
     $pdo->exec("UPDATE Users SET is_admin = 1 WHERE id = 1");
+    
+    // Populate default masked settings placeholders
+    $pdo->exec("INSERT IGNORE INTO SystemSettings (key_name, val) VALUES ('donation_upi', 'your-upi-id@bank')");
+    $pdo->exec("INSERT IGNORE INTO SystemSettings (key_name, val) VALUES ('donation_paypal', 'your-paypal-username')");
     
     echo json_encode(["message" => "Database setup and upgraded successfully"]);
 } catch (PDOException $e) {
