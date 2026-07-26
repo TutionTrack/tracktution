@@ -13,6 +13,15 @@ if ($method === 'GET') {
 if ($method === 'POST') {
     $data = json_decode(file_get_contents('php://input'), true);
     
+    // Verify student belongs to this teacher (prevent IDOR)
+    $stmt = $pdo->prepare("SELECT id FROM Students WHERE id = ? AND teacher_id = ?");
+    $stmt->execute([$data['student_id'], $userId]);
+    if (!$stmt->fetch()) {
+        http_response_code(403);
+        echo json_encode(["error" => "Forbidden: Student does not belong to you"]);
+        exit;
+    }
+    
     // Check if this slot overlaps with an existing session for the teacher
     $stmt = $pdo->prepare("
         SELECT s.*, st.name as student_name 
