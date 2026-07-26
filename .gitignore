@@ -3,3 +3,5 @@ dist/
 .env
 database.sqlite
 .DS_Store
+jwt_secret.txt
+api/jwt_secret.txt

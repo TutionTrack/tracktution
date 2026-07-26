@@ -24,12 +24,25 @@ $options = [
 try {
      $pdo = new PDO($dsn, $user, $pass, $options);
 } catch (\PDOException $e) {
-     echo json_encode(["error" => "Database connection failed: " . $e->getMessage()]);
+     echo json_encode(["error" => "Database connection failed"]);
      exit;
 }
 
 // Simple JWT-like implementation for PHP (Self-contained)
-define('SECRET_KEY', 'TrackTutionSuperSecretKey2026');
+$secretFile = __DIR__ . '/jwt_secret.txt';
+if (!file_exists($secretFile)) {
+    try {
+        $randomSecret = bin2hex(random_bytes(32));
+        @file_put_contents($secretFile, $randomSecret);
+    } catch (\Exception $e) {
+        // Fallback default
+    }
+}
+$jwtSecret = @file_get_contents($secretFile);
+if (empty($jwtSecret)) {
+    $jwtSecret = 'TrackTutionSuperSecretKey2026'; // fallback default
+}
+define('SECRET_KEY', trim($jwtSecret));
 
 function generateToken($userId) {
     $header = json_encode(['typ' => 'JWT', 'alg' => 'HS256']);
